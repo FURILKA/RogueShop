@@ -35,10 +35,22 @@ class owner(commands.Cog):
             except Exception as error:
                 self.LLC.addlog(str(error),'error')
         # **********************************************************************************************************************************************************
+        def load_channels():
+            try:
+                result = self.bot.mysql.execute(f"SELECT * FROM work_channels")
+                for row in result:
+                    channel_id = row['channel_id']
+                    channel_lng = row['channel_lng']
+                    self.bot.allow_channels[channel_id]=channel_lng
+            except Exception as error:
+                self.LLC.addlog(str(error),'error')
+        # **********************************************************************************************************************************************************
         self.bot.LLC.addlog('Loading commands')
         load_commands()
         self.bot.LLC.addlog('Loading emoji')
         load_emoji()
+        self.bot.LLC.addlog('Loading working channels')
+        load_channels()
         self.bot.LLC.addlog('Bot is online and ready to serve')
         self.bot.IsOnlineNow = True
 # ==================================================================================================================================================================

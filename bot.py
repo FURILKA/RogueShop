@@ -27,13 +27,7 @@ bot.rogue_guild_id = int(config.get(section='RogueWar',setting='rogue_guild_id')
 bot.vetted_role_id = int(config.get(section='RogueWar',setting='vetted_role_id'))
 bot.roguewar_token = ''
 bot.emoji = {}
-bot.allow_channels = {
-    801763545922273291 : 'en',
-    801731757204176920 : 'ru',
-    807011051848597534 : 'en',
-    803274475805736960 : 'ru',
-    873875873810489384 : 'en'
-    } 
+bot.allow_channels = {} 
 # ==================================================================================================================================================================
 # cogs load order
 cogs_list = [
