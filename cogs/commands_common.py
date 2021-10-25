@@ -16,9 +16,11 @@ class commands_common(commands.Cog):
     def is_player_vetted(self,ctx):
         try:
             guild = self.bot.get_guild(self.bot.rogue_guild_id)
+            if guild == None: return(False)
             role = guild.get_role(self.bot.vetted_role_id)
+            if role == None: return(False)
             member = guild.get_member(ctx.author.id)
-            if member == None: return False
+            if member == None: return(False)
             for member_role in member.roles:
                 if member_role == role: return(True)
             return(False)
@@ -52,21 +54,22 @@ class commands_common(commands.Cog):
             if lng == 'ru': footer_text = f'Для вызова справки по команде введи {self.bot.prefix}help {command_name}'
             if lng == 'en': footer_text = f'For additional help by command use  {self.bot.prefix}help {command_name}'
             # ------------------------------------------------------------------------------------------------------------------------------------------------------
+            query = f"SELECT * FROM factions_default WHERE channel_id = {ctx.channel.id} AND user_id = {ctx.author.id} AND market_type = '{market_type}'"
+            result_faction_by_user = self.bot.mysql.execute(query)
+            if result_faction_by_user != [] and result_faction_by_user != (): 
+                if item_name == None and faction_name.lower() not in self.bot.factions: item_name = faction_name
+                faction_name = result_faction_by_user[0]['faction_name_short']
+            # ------------------------------------------------------------------------------------------------------------------------------------------------------
             # if faction name not specified
             if faction_name == None:
-                query = f"SELECT * FROM factions_default WHERE channel_id = {ctx.channel.id} AND user_id = {ctx.author.id}"
-                result_faction_by_user = self.bot.mysql.execute(query)
-                if result_faction_by_user != [] and result_faction_by_user != (): 
-                    faction_name = result_faction_by_user[0]['faction_name_short']
-                else:
-                    if lng == 'ru': msgtext  = f'Имя фракции не указано!\n'
-                    if lng == 'en': msgtext  = f'Faction name dont specified!\n'
-                    embed=discord.Embed(color=color['red'])
-                    embed.add_field(name=titles[lng]['error'], value=msgtext, inline=False)
-                    embed.set_footer(text=footer_text)
-                    await ctx.message.add_reaction('❌')
-                    await ctx.send(embed=embed)
-                    return
+                if lng == 'ru': msgtext  = f'Имя фракции не указано!\n'
+                if lng == 'en': msgtext  = f'Faction name dont specified!\n'
+                embed=discord.Embed(color=color['red'])
+                embed.add_field(name=titles[lng]['error'], value=msgtext, inline=False)
+                embed.set_footer(text=footer_text)
+                await ctx.message.add_reaction('❌')
+                await ctx.send(embed=embed)
+                return
             else:
                 faction_name = faction_name.lower()
             # ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -112,6 +115,8 @@ class commands_common(commands.Cog):
                             LOWER(item_name) = LOWER('{item_name}')
                         AND
                             status = 'in progress'
+                        AND
+                            LOWER(faction_name_short) = LOWER('{faction_name}') 
             """
             result = self.bot.mysql.execute(query)
             if result != [] and result != ():
@@ -994,7 +999,7 @@ class commands_common(commands.Cog):
             if ctx.channel.id not in self.bot.allow_channels: return
             command_name = 'setfactionbm'
             self.LLC.addlog(f'[{ctx.author.name}] new command "{self.bot.prefix}{command_name}" {faction_name=}',location=ctx.guild.name)
-            await self.set_faction_by_market_type(ctx=ctx,market_type='blackmarket')
+            await self.set_faction_by_market_type(ctx=ctx,market_type='blackmarket',faction_name=faction_name)
         except Exception as error:
             self.LLC.addlog(str(error),msg_type='error',location=ctx.guild.name)
     # **************************************************************************************************************************************************************

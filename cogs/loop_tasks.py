@@ -15,14 +15,24 @@ class loop_tasks(commands.Cog):
         self.bot = bot
         self.LLC = bot.LLC
         self.mysql = bot.mysql
-        self.LLC.addlog('Running RogueWar API-token update function')
-        self.roguewar_token_update.start()
-        self.LLC.addlog('Running Factions list update function')
-        self.factions_list_update.start()
-        self.LLC.addlog('Running Onlineshops update function')
-        self.onlineshop_update.start()
-        self.LLC.addlog('Running Blackmarkets update function')
-        self.blackmarket_update.start()
+        # ----------------------------------------------------------------------------------------------------------------------------------------------------------
+        if self.bot.launch_type == 'main_build':
+            self.LLC.addlog('Running RogueWar API-token update function')
+            self.roguewar_token_update.start()
+            self.LLC.addlog('Running Factions list update function')
+            self.factions_list_update.start()
+            self.LLC.addlog('Running Onlineshops update function')
+            self.onlineshop_update.start()
+            self.LLC.addlog('Running Blackmarkets update function')
+            self.blackmarket_update.start()
+        else:
+            self.LLC.addlog(f'{self.bot.launch_type=}')
+            self.LLC.addlog('This is dev build')
+            self.LLC.addlog('RogueWar API-token update skipped')
+            self.LLC.addlog('Factions list update skipped')
+            self.LLC.addlog('Onlineshops update skipped')
+            self.LLC.addlog('Blackmarkets update skipped')
+        # ----------------------------------------------------------------------------------------------------------------------------------------------------------
         self.LLC.addlog('Running check for items in markets')
         self.check_for_items_in_markets.start()
     # **************************************************************************************************************************************************************
@@ -46,7 +56,6 @@ class loop_tasks(commands.Cog):
                 factions[faction_short]=faction_full
             self.bot.mysql.execute('TRUNCATE TABLE factions_list')
             self.bot.mysql.execute("INSERT INTO factions_list (name_short,name_full) VALUES " + ','.join(values))
-            self.bot.factions = factions
             self.LLC.addlog('Faction list updated succesfully')
         except Exception as error:
             self.bot.LLC.addlog(str(error),msg_type='error')
@@ -69,7 +78,7 @@ class loop_tasks(commands.Cog):
             self.bot.LLC.addlog(f'Cant update botauth token!',msg_type='error',location='api/botauth')
             self.bot.roguewar_token = ''
     # **************************************************************************************************************************************************************
-    @tasks.loop(hours=1,reconnect=True)
+    @tasks.loop(minutes=1,reconnect=True)
     async def onlineshop_update(self):
         # **********************************************************************************************************************************************************
         def onlineshop_update_thread(self):
@@ -124,7 +133,7 @@ class loop_tasks(commands.Cog):
         except Exception as error:
             self.bot.LLC.addlog(str(error),msg_type='error')
     # **************************************************************************************************************************************************************
-    @tasks.loop(hours=1,reconnect=True)
+    @tasks.loop(minutes=1,reconnect=True)
     async def blackmarket_update(self):
         # **********************************************************************************************************************************************************
         def blackmarket_update_thread(self):
@@ -179,7 +188,7 @@ class loop_tasks(commands.Cog):
         except Exception as error:
             self.bot.LLC.addlog(str(error),msg_type='error')
     # **************************************************************************************************************************************************************
-    @tasks.loop(minutes=1,reconnect=True)
+    @tasks.loop(minutes=3,reconnect=True)
     async def export_logs(self):
         try:
             self.bot.LLC.export()
@@ -222,6 +231,8 @@ class loop_tasks(commands.Cog):
                         request.user_is_vetted = 0
                     AND
                         shop.for_non_vets = 1
+                    AND
+                        request.market_type = '{market_type}'
                     """
                 query_vett_players = f"""
                     SELECT 
@@ -246,6 +257,8 @@ class loop_tasks(commands.Cog):
                         shop.item_count != '0'
                     AND
                         request.user_is_vetted = 1
+                    AND
+                        request.market_type = '{market_type}'
                     """
                 query_list[market_type] = [query_non_vett_players,query_vett_players]
             # ------------------------------------------------------------------------------------------------------------------------------------------------------

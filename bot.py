@@ -9,6 +9,7 @@ config = configurator(os.path.dirname(os.path.realpath(__file__))+"\config\confi
 prefix = config.get(section='bot',setting='prefix')
 token  = config.get(section='bot',setting='token')
 owners = config.get(section='bot',setting='owners')
+launch_type = config.get(section='bot',setting='launch_type')
 intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix=prefix,intents=intents)
@@ -25,6 +26,7 @@ bot.rogue_mainsite = config.get(section='RogueWar',setting='rogue_mainsite')
 bot.bot_api_secret = config.get(section='RogueWar',setting='bot_api_secret')
 bot.rogue_guild_id = int(config.get(section='RogueWar',setting='rogue_guild_id'))
 bot.vetted_role_id = int(config.get(section='RogueWar',setting='vetted_role_id'))
+bot.launch_type = launch_type
 bot.roguewar_token = ''
 bot.emoji = {}
 bot.allow_channels = {} 
