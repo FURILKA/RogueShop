@@ -15,6 +15,22 @@ class loop_tasks(commands.Cog):
         self.bot = bot
         self.LLC = bot.LLC
         self.mysql = bot.mysql
+        # **********************************************************************************************************************************************************
+        def load_factions():
+            try:
+                factions = {}
+                result = self.bot.mysql.execute("SELECT * FROM factions_list")
+                for row in result:
+                    name_short = row['name_short']
+                    name_full = row['name_full']
+                    factions[name_short]=name_full
+                self.bot.factions = factions
+            except Exception as error:
+                self.LLC.addlog(str(error),'error')       
+        # **********************************************************************************************************************************************************
+        self.LLC.addlog('Loading factions')
+        load_factions()
+        self.LLC.addlog('Factions loaded')
         # ----------------------------------------------------------------------------------------------------------------------------------------------------------
         if self.bot.launch_type == 'main_build':
             self.LLC.addlog('Running RogueWar API-token update function')

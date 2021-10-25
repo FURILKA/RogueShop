@@ -44,27 +44,12 @@ class owner(commands.Cog):
                     self.bot.allow_channels[channel_id]=channel_lng
             except Exception as error:
                 self.LLC.addlog(str(error),'error')
-        # **********************************************************************************************************************************************************
-        def load_factions():
-            try:
-                factions = {}
-                result = self.bot.mysql.execute("SELECT * FROM factions_list")
-                for row in result:
-                    name_short = row['name_short']
-                    name_full = row['name_full']
-                    factions[name_short]=name_full
-                self.bot.factions = factions
-            except Exception as error:
-                self.LLC.addlog(str(error),'error')       
-        # **********************************************************************************************************************************************************
         self.bot.LLC.addlog('Loading commands')
         load_commands()
         self.bot.LLC.addlog('Loading emoji')
         load_emoji()
         self.bot.LLC.addlog('Loading working channels')
         load_channels()
-        self.bot.LLC.addlog('Loading factions list')
-        load_factions()
         self.bot.LLC.addlog('Bot is online and ready to serve')
         self.bot.IsOnlineNow = True
 # ==================================================================================================================================================================
