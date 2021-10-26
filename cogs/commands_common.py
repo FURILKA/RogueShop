@@ -57,8 +57,12 @@ class commands_common(commands.Cog):
             query = f"SELECT * FROM factions_default WHERE channel_id = {ctx.channel.id} AND user_id = {ctx.author.id} AND market_type = '{market_type}'"
             result_faction_by_user = self.bot.mysql.execute(query)
             if result_faction_by_user != [] and result_faction_by_user != (): 
-                if item_name == None and faction_name.lower() not in self.bot.factions: item_name = faction_name
-                faction_name = result_faction_by_user[0]['faction_name_short']
+                if item_name == None and faction_name.lower() not in self.bot.factions:
+                    item_name = faction_name
+                    faction_name = result_faction_by_user[0]['faction_name_short']
+                if item_name != None:
+                    item_name = faction_name + ' ' + item_name
+                    faction_name = result_faction_by_user[0]['faction_name_short']
             # ------------------------------------------------------------------------------------------------------------------------------------------------------
             # if faction name not specified
             if faction_name == None:
