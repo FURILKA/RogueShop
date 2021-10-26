@@ -242,7 +242,9 @@ class commands_common(commands.Cog):
             # ------------------------------------------------------------------------------------------------------------------------------------------------------
             # check - if member have any find requests with this market type?
             query = f"""
-                SELECT * 
+                SELECT 
+                    *,
+                    ADDDATE(date_add,INTERVAL 3 DAY) AS 'date_expire' 
                 FROM requests 
                 WHERE
                     market_type = '{market_type}'
@@ -267,26 +269,47 @@ class commands_common(commands.Cog):
                 return
             # ------------------------------------------------------------------------------------------------------------------------------------------------------
             i = 1
+            i_list = []
             items_list = []
-            if lng == 'ru':
-                title = 'Информация о текущих запросах на поиск'
-                embed_name = 'Список запросов:'
-            if lng == 'en':
-                title = 'Information about current find requests'
-                embed_name = 'Requests list:'
-            embed = discord.Embed(title=title, color = color['blue'])
+            factions_list = []
+            expire_list = []
             for row in result:
                 item_name = row['item_name']
                 faction_name_full = row['faction_name_full']
-                items_list.append(f'#{str(i)} [{faction_name_full}] **{item_name}**')
+                i_list.append(str(i))
+                items_list.append(item_name)
+                factions_list.append(faction_name_full)
+                expire_date = row['date_expire']
+                now = datetime.now()
+                expire_seconds = (expire_date - now).total_seconds()
+                expire_hours = round(expire_seconds/60/60)
+                if expire_hours < 72: expire_hours = expire_hours + 1
+                expire_list.append(str(expire_hours))
                 i += 1
-            embed_value = '\n'.join(items_list)
+            if lng == 'ru':
+                expire_list = ['Через '+str(i)+'ч' for i in expire_list]
+                title = 'Информация о твоих текущих запросах на поиск'
+                description = 'Список запросов:'
+                embed = discord.Embed(title=title,description=description, color = color['blue'])
+                #embed.add_field(name='#', value='\n'.join(i_list), inline=True)
+                embed.add_field(name='Запрос', value='\n'.join(items_list), inline=True)
+                embed.add_field(name='Фракция', value='\n'.join(factions_list), inline=True)
+                embed.add_field(name='Истекает', value='\n'.join(expire_list), inline=True)
+            if lng == 'en':
+                expire_list = [str(i)+' hours' for i in expire_list]
+                title = 'Information about your current find requests'
+                description = 'Requests list:'
+                embed = discord.Embed(title=title,description=description, color = color['blue'])
+                #embed.add_field(name='#', value='\n'.join(i_list), inline=True)
+                embed.add_field(name='Request', value='\n'.join(items_list), inline=True)
+                embed.add_field(name='Faction', value='\n'.join(factions_list), inline=True)
+                embed.add_field(name='Expire in', value='\n'.join(expire_list), inline=True)
             if market_type == 'onlineshop':  emoji_name = self.bot.emoji['shoppingcart']
             if market_type == 'blackmarket': emoji_name = self.bot.emoji['pirateflag']
             emoji_id =''.join(i for i in emoji_name if i.isdigit())
             emoji_obj = self.bot.get_emoji(int(emoji_id))
             embed.set_thumbnail(url=str(emoji_obj.url))
-            embed.add_field(name=embed_name, value=embed_value, inline=False)
+            
             embed.set_footer(text=footer_text)    
             await ctx.send(content=ctx.author.mention,embed=embed)
             return
@@ -835,7 +858,7 @@ class commands_common(commands.Cog):
             self.LLC.addlog(str(error),msg_type='error',location=ctx.guild.name)
     # **************************************************************************************************************************************************************
     @commands.command()
-    async def bmfindall(self,ctx,item_name=None):
+    async def bmfindall(self,ctx,*,item_name=None):
         try:
             lng = self.bot.allow_channels[ctx.channel.id]
             command_name = 'bmfindall'
@@ -843,6 +866,7 @@ class commands_common(commands.Cog):
             if lng == 'en': footer_text = f'For additional help by command use  {self.bot.prefix}help {command_name}'
             self.LLC.addlog(f'[{ctx.author.name}] new command "{self.bot.prefix}{command_name}" {item_name=}',location=ctx.guild.name)
             # ------------------------------------------------------------------------------------------------------------------------------------------------------
+            print(f'{item_name=}')
             if item_name == None:
                 if lng == 'ru':
                     msgtext  = f'Имя предмета для поиска не указано!'

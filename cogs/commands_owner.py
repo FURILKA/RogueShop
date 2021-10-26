@@ -31,6 +31,7 @@ class owner(commands.Cog):
     @commands.command(aliases = ["reload"])
     async def command_reload(self,ctx):
         try:
+            if ctx.channel.id not in self.bot.allow_channels: return
             command_name = 'reload'
             guild = ctx.guild
             member = ctx.author
@@ -56,6 +57,7 @@ class owner(commands.Cog):
     @commands.command(aliases = ["reboot"])
     async def command_reboot(self,ctx):
         try:
+            if ctx.channel.id not in self.bot.allow_channels: return
             guild = ctx.guild
             member = ctx.author
             self.LLC.addlog(f'Новая команда "{self.bot.prefix}reboot" [сервер: "{guild.name}", пользователь: "{member.name}"]')

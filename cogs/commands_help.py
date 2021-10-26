@@ -44,7 +44,7 @@ class help(commands.Cog):
                 # Sending message
                 if lng == 'ru': embed.set_footer(text=f'Для подробной справки введи {self.bot.prefix}help <имя_команды>')
                 if lng == 'en': embed.set_footer(text=f'For more help use {self.bot.prefix}help <command_name>')
-                embed.set_thumbnail(url=ctx.guild.icon_url)
+                embed.set_thumbnail(url=self.bot.user.avatar_url)
                 await ctx.send(embed=embed)
                 return
             # ------------------------------------------------------------------------------------------------------------------------------------------------------

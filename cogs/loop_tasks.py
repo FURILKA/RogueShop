@@ -41,6 +41,8 @@ class loop_tasks(commands.Cog):
             self.onlineshop_update.start()
             self.LLC.addlog('Running Blackmarkets update function')
             self.blackmarket_update.start()
+            self.LLC.addlog('Logger started')
+            self.export_logs.start()
         else:
             self.LLC.addlog(f'{self.bot.launch_type=}')
             self.LLC.addlog('This is dev build')
