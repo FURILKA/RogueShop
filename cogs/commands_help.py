@@ -48,15 +48,40 @@ class help(commands.Cog):
                     for command_dict in commands_list:
                         command_name = command_dict['name']
                         command_title = command_dict['title']
-                        field_value += f'**{command_name}** : {command_title}\n'
+                        field_value += f'**{self.bot.prefix}{command_name}** : {command_title}\n'
                     command_category_name = command_category
                     if command_category_name == 'Онлайн магазин' or command_category_name == 'Onlineshop':
-                        command_category_name = self.bot.emoji['shoppingcart'] + ' ' + command_category_name
+                        command_category_name = self.bot.emoji['shoppingcart'] + '  ' + command_category_name
                     if command_category_name == 'Черный рынок' or command_category_name == 'Blackmarket':
-                        command_category_name = self.bot.emoji['pirateflag'] + ' ' + command_category_name
+                        command_category_name = self.bot.emoji['pirateflag'] + '  ' + command_category_name
                     if command_category_name == 'Фракции' or command_category_name == 'Factions':
                         command_category_name = ':triangular_flag_on_post:  ' + command_category_name
                     embed.add_field(name=f'{command_category_name}',value=field_value,inline=False)
+                # --------------------------------------------------------------------------------------------------------------------------------------------------
+                if lng == 'en':
+                    help_text  = 'Online shops and black market data is updating once a minute\n'
+                    help_text += 'Faction names typing in single word, without spaces\n'
+                    help_text += 'You can write name of item partially, case don`t matter\n'
+                    help_text += 'By request "pulse" you will can find "X-Pulse" and "Large ER Pulse"\n'
+                    help_text += 'Number of requests is not limited, each request expires in 72 hours\n'
+                    help_text += 'If you do not see the item found on request in store: update store\n'
+                    help_text += 'To update store, you need to buy something (like 1/2 ammo)\n'
+                    help_text += 'If item still not there: probably someone bought it faster than you\n'
+                    help_text += 'For questions/suggestions please contact: FURILKA#5953'
+                    embed.add_field(name='General info',value=help_text,inline=False)
+                if lng == 'ru':
+                    help_text  = 'Ассортимент магазинов обновляется один раз в минуту\n'
+                    help_text += 'Имя фракций пишется одним словом, без пробелов\n'
+                    help_text += 'Имя предмета можно писать частично, в любом регистре\n'
+                    help_text += 'По запросу "pulse" будет найдено "X-Pulse" и "ER Pulse"\n'
+                    help_text += 'Количество запросов не ограничено\n'
+                    help_text += 'Срок действия запроса: 72 часа с момента создания\n'
+                    help_text += 'Если в магазине нет предмета по запросу: обнови магазин\n'
+                    help_text += 'Что бы обновить магазин: купи в нём что угодно\n'
+                    help_text += 'Если предмета всё равно нет: его уже кто-то купил\n'
+                    help_text += 'По всем вопросам/замечаниям обращайтесь: FURILKA#5953'
+                    embed.add_field(name='Общая информация',value=help_text,inline=False)
+                # --------------------------------------------------------------------------------------------------------------------------------------------------
                 # Sending message
                 if lng == 'ru': embed.set_footer(text=f'Для подробной справки введи {self.bot.prefix}help <имя_команды>')
                 if lng == 'en': embed.set_footer(text=f'For more help use {self.bot.prefix}help <command_name>')
