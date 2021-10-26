@@ -866,7 +866,6 @@ class commands_common(commands.Cog):
             if lng == 'en': footer_text = f'For additional help by command use  {self.bot.prefix}help {command_name}'
             self.LLC.addlog(f'[{ctx.author.name}] new command "{self.bot.prefix}{command_name}" {item_name=}',location=ctx.guild.name)
             # ------------------------------------------------------------------------------------------------------------------------------------------------------
-            print(f'{item_name=}')
             if item_name == None:
                 if lng == 'ru':
                     msgtext  = f'Имя предмета для поиска не указано!'
