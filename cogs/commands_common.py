@@ -60,7 +60,7 @@ class commands_common(commands.Cog):
                 if item_name == None and faction_name.lower() not in self.bot.factions:
                     item_name = faction_name
                     faction_name = result_faction_by_user[0]['faction_name_short']
-                if item_name != None:
+                if item_name != None and faction_name.lower() not in self.bot.factions:
                     item_name = faction_name + ' ' + item_name
                     faction_name = result_faction_by_user[0]['faction_name_short']
             # ------------------------------------------------------------------------------------------------------------------------------------------------------
