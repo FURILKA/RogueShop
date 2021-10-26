@@ -295,18 +295,18 @@ class commands_common(commands.Cog):
                 title = 'Информация о твоих текущих запросах на поиск'
                 description = 'Список запросов:'
                 embed = discord.Embed(title=title,description=description, color = color['blue'])
-                #embed.add_field(name='#', value='\n'.join(i_list), inline=True)
+                embed.add_field(name='#', value='\n'.join(i_list), inline=True)
                 embed.add_field(name='Запрос', value='\n'.join(items_list), inline=True)
-                embed.add_field(name='Фракция', value='\n'.join(factions_list), inline=True)
+                #embed.add_field(name='Фракция', value='\n'.join(factions_list), inline=True)
                 embed.add_field(name='Истекает', value='\n'.join(expire_list), inline=True)
             if lng == 'en':
                 expire_list = [str(i)+' hours' for i in expire_list]
                 title = 'Information about your current find requests'
                 description = 'Requests list:'
                 embed = discord.Embed(title=title,description=description, color = color['blue'])
-                #embed.add_field(name='#', value='\n'.join(i_list), inline=True)
+                embed.add_field(name='#', value='\n'.join(i_list), inline=True)
                 embed.add_field(name='Request', value='\n'.join(items_list), inline=True)
-                embed.add_field(name='Faction', value='\n'.join(factions_list), inline=True)
+                #embed.add_field(name='Faction', value='\n'.join(factions_list), inline=True)
                 embed.add_field(name='Expire in', value='\n'.join(expire_list), inline=True)
             if market_type == 'onlineshop':  emoji_name = self.bot.emoji['shoppingcart']
             if market_type == 'blackmarket': emoji_name = self.bot.emoji['pirateflag']

@@ -23,7 +23,11 @@ class help(commands.Cog):
                 # forming 'commands_by_category' dict with commands names by category
                 commands_by_category = {}
                 for command_row in self.bot.commands_list:
-                    command = {'name': command_row['command_name'],'type': ''}
+                    command = {
+                        'name': command_row['command_name'],
+                        'type': '',
+                        'title':command_row[f'command_title_{lng}']
+                        }
                     for command_type_row in self.bot.commands_type:
                         if command_type_row['type'] == command_row['command_type']:
                             command['type'] = command_type_row[f'name_{lng}']
@@ -31,16 +35,28 @@ class help(commands.Cog):
                         if lng == 'ru' : command['type'] = 'Без категории'
                         if lng == 'en' : command['type'] = 'Uncategorized'
                     if command['type'] not in commands_by_category: commands_by_category[command['type']] = []
-                    commands_by_category[command['type']].append(command['name'])
+                    commands_by_category[command['type']].append({
+                        'name': command['name'],
+                        'title': command['title']
+                    })
                 # Dict is done, making message
                 if lng == 'ru': embed=discord.Embed(title=":page_facing_up: Справка", description="Список доступных команд:", color=color['green'])
                 if lng == 'en': embed=discord.Embed(title=":page_facing_up: Help", description="Available commands list:", color=color['green'])
                 for command_category in commands_by_category:
                     commands_list = commands_by_category[command_category]
                     field_value = ''
-                    for command_name in commands_list:
-                        field_value += command_name + '\n'
-                    embed.add_field(name=f'{command_category}',value=field_value,inline=False)
+                    for command_dict in commands_list:
+                        command_name = command_dict['name']
+                        command_title = command_dict['title']
+                        field_value += f'**{command_name}** : {command_title}\n'
+                    command_category_name = command_category
+                    if command_category_name == 'Онлайн магазин' or command_category_name == 'Onlineshop':
+                        command_category_name = self.bot.emoji['shoppingcart'] + ' ' + command_category_name
+                    if command_category_name == 'Черный рынок' or command_category_name == 'Blackmarket':
+                        command_category_name = self.bot.emoji['pirateflag'] + ' ' + command_category_name
+                    if command_category_name == 'Фракции' or command_category_name == 'Factions':
+                        command_category_name = ':triangular_flag_on_post:  ' + command_category_name
+                    embed.add_field(name=f'{command_category_name}',value=field_value,inline=False)
                 # Sending message
                 if lng == 'ru': embed.set_footer(text=f'Для подробной справки введи {self.bot.prefix}help <имя_команды>')
                 if lng == 'en': embed.set_footer(text=f'For more help use {self.bot.prefix}help <command_name>')
