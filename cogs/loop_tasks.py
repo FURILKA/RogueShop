@@ -41,6 +41,8 @@ class loop_tasks(commands.Cog):
             self.onlineshop_update.start()
             self.LLC.addlog('Running Blackmarkets update function')
             self.blackmarket_update.start()
+            self.LLC.addlog('Running checking expiration of requests')
+            self.check_for_expire_requests.start()
             self.LLC.addlog('Logger started')
             self.export_logs.start()
         else:
@@ -50,6 +52,7 @@ class loop_tasks(commands.Cog):
             self.LLC.addlog('Factions list update skipped')
             self.LLC.addlog('Onlineshops update skipped')
             self.LLC.addlog('Blackmarkets update skipped')
+            self.LLC.addlog('Сecking expiration of requests skipped')
         # ----------------------------------------------------------------------------------------------------------------------------------------------------------
         self.LLC.addlog('Running check for items in markets')
         self.check_for_items_in_markets.start()
@@ -370,6 +373,22 @@ class loop_tasks(commands.Cog):
                 query = f"""UPDATE requests SET status = 'complete' WHERE id = {' or id = '.join(list_row_id_to_close_request)}"""
                 self.bot.mysql.execute(query)
             # ------------------------------------------------------------------------------------------------------------------------------------------------------
+        except Exception as error:
+            self.bot.LLC.addlog(str(error),msg_type='error')
+    # **************************************************************************************************************************************************************
+    @tasks.loop(hours=1,reconnect=True)
+    async def check_for_expire_requests(self):
+        try:
+            query = """
+                UPDATE 
+                    requests 
+                SET 
+                    status = 'expire'
+                WHERE 
+                        status = 'in progress' 
+                    AND 
+                        DATE_ADD(date_add,INTERVAL 3 DAY) < NOW()"""
+            self.bot.mysql.execute(query)
         except Exception as error:
             self.bot.LLC.addlog(str(error),msg_type='error')
     # **************************************************************************************************************************************************************
