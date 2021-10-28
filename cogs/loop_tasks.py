@@ -149,6 +149,14 @@ class loop_tasks(commands.Cog):
                 self.bot.LLC.addlog(str(error),msg_type='error')
         # **********************************************************************************************************************************************************
         try:
+            if self.bot.roguewar_token == '':
+                self.bot.LLC.addlog('roguewar access token is missing!','warning')
+                self.bot.LLC.addlog('trying to get new roguewar access token','warning')
+                await self.roguewar_token_update()
+                if self.bot.roguewar_token == '':
+                    self.bot.LLC.addlog('roguewar access token still missing!','error')
+                    return
+                self.bot.LLC.addlog('roguewar access token updated succesfull','warning')
             thread = threading.Thread(target=onlineshop_update_thread,args=(self,))
             thread.start()
         except Exception as error:
@@ -204,6 +212,14 @@ class loop_tasks(commands.Cog):
                 self.bot.LLC.addlog(str(error),msg_type='error')
         # **********************************************************************************************************************************************************
         try:
+            if self.bot.roguewar_token == '':
+                self.bot.LLC.addlog('roguewar access token is missing!','warning')
+                self.bot.LLC.addlog('trying to get new roguewar access token','warning')
+                await self.roguewar_token_update()
+                if self.bot.roguewar_token == '':
+                    self.bot.LLC.addlog('roguewar access token still missing!','error')
+                    return
+                self.bot.LLC.addlog('roguewar access token updated succesfull','warning')
             thread = threading.Thread(target=blackmarket_update_thread,args=(self,))
             thread.start()
         except Exception as error:
