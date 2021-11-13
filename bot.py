@@ -26,6 +26,7 @@ bot.rogue_mainsite = config.get(section='RogueWar',setting='rogue_mainsite')
 bot.bot_api_secret = config.get(section='RogueWar',setting='bot_api_secret')
 bot.rogue_guild_id = int(config.get(section='RogueWar',setting='rogue_guild_id'))
 bot.vetted_role_id = int(config.get(section='RogueWar',setting='vetted_role_id'))
+bot.moder_role_id  = int(config.get(section='RogueWar',setting='moder_role_id'))
 bot.launch_type = launch_type
 bot.roguewar_token = ''
 bot.emoji = {}

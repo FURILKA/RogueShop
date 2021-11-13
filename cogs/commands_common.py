@@ -17,12 +17,14 @@ class commands_common(commands.Cog):
         try:
             guild = self.bot.get_guild(self.bot.rogue_guild_id)
             if guild == None: return(False)
-            role = guild.get_role(self.bot.vetted_role_id)
-            if role == None: return(False)
+            role_vetted = guild.get_role(self.bot.vetted_role_id)
+            role_moder = guild.get_role(self.bot.moder_role_id)
+            if role_vetted == None and role_moder == None: return(False)
             member = guild.get_member(ctx.author.id)
             if member == None: return(False)
             for member_role in member.roles:
-                if member_role == role: return(True)
+                if member_role == role_vetted: return(True)
+                if member_role == role_moder:  return(True)
             return(False)
         except Exception as error:
             self.LLC.addlog(str(error),msg_type='error')
