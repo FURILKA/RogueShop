@@ -66,15 +66,23 @@ class loop_tasks(commands.Cog):
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36',}
             request = requests.get(f'{self.bot.rogue_mainsite}factions',headers=headers)
             soup = bs4.BeautifulSoup(request.text,features='lxml')
-            table = soup.findAll('h2')
-            table.pop(0)
             values = []
             factions = {}
+            table = soup.findAll('a')
+            table.pop(0)
             for item in table:
-                faction_full = re.sub('<[^>]+>', '',str(item))
-                faction_short = faction_full.replace(' ','').lower()
-                values.append(f"('{faction_short}','{faction_full}')")
-                factions[faction_short]=faction_full
+                s_item = str(item)
+                re_result = re.findall(r'"/([^"]*)"', s_item)
+                if re_result != []:
+                    href = re_result[0]
+                    x = href.find('factions/')
+                    if href.find('factions/')>=0 and href.find('/overview')>=0:
+                        faction_full = href.replace('factions/','').replace('/overview','')
+                        faction_short = faction_full.lower()
+                        if not f"('{faction_short}','{faction_full}')" in values:
+                            values.append(f"('{faction_short}','{faction_full}')")
+                        if not faction_short in factions:
+                            factions[faction_short]=faction_full
             self.bot.mysql.execute('TRUNCATE TABLE factions_list')
             self.bot.mysql.execute("INSERT INTO factions_list (name_short,name_full) VALUES " + ','.join(values))
             self.LLC.addlog('Faction list updated succesfully')
@@ -115,16 +123,19 @@ class loop_tasks(commands.Cog):
                     shops_info[faction_short]=[]
                     url = f'{self.bot.rogue_mainsite}api/shop/{faction_short}?blackMarket=0'
                     response = requests.get(url,headers={'Authorization':f'Bearer {self.bot.roguewar_token}'})
-                    json_OnlineShopData = json.loads(response.text)
-                    for item in json_OnlineShopData['ShopContents']:
-                        item_name = item['Name'].replace('\'','\\\'')
-                        item_count = item['Count']
-                        item_for_non_vets = item['AvailableToNonVets']
-                        shops_info[faction_short].append(
-                            {'item_name':item_name,
-                            'item_count': item_count,
-                            'faction_full':self.bot.factions[faction_short],
-                            'for_non_vets': item_for_non_vets})
+                    if response.status_code == 200:
+                        json_OnlineShopData = json.loads(response.text)
+                        for item in json_OnlineShopData['ShopContents']:
+                            item_name = item['Name'].replace('\'','\\\'')
+                            item_count = item['Count']
+                            item_for_non_vets = item['AvailableToNonVets']
+                            shops_info[faction_short].append(
+                                {'item_name':item_name,
+                                'item_count': item_count,
+                                'faction_full':self.bot.factions[faction_short],
+                                'for_non_vets': item_for_non_vets})
+                    else:
+                        self.bot.logger.addlog(f'cant update "'+ self.bot.factions[faction_short] + '" online shop info, server response code = ' + str(response.status_code))
                 # ------------------------------------------------------------------------------------------------------------------------------------------------------
                 # creating query for inser all data
                 if shops_info == {}: return
@@ -146,7 +157,10 @@ class loop_tasks(commands.Cog):
                 #self.LLC.addlog('Onlineshop information updated')
                 # ------------------------------------------------------------------------------------------------------------------------------------------------------
             except Exception as error:
-                self.bot.LLC.addlog(str(error),msg_type='error')
+                if url != 'url': print(f'{url=}')
+                if response != '': print(f'{response=}')
+                if response.text != '': print(f'{response.text=}')
+                self.bot.logger.adderrorlog()
         # **********************************************************************************************************************************************************
         try:
             if self.bot.roguewar_token == '':
@@ -178,16 +192,19 @@ class loop_tasks(commands.Cog):
                     shops_info[faction_short]=[]
                     url = f'{self.bot.rogue_mainsite}api/shop/{faction_short}?blackMarket=1'
                     response = requests.get(url,headers={'Authorization':f'Bearer {self.bot.roguewar_token}'})
-                    json_OnlineShopData = json.loads(response.text)
-                    for item in json_OnlineShopData['ShopContents']:
-                        item_name = item['Name'].replace('\'','\\\'')
-                        item_count = item['Count']
-                        item_for_non_vets = item['AvailableToNonVets']
-                        shops_info[faction_short].append(
-                            {'item_name':item_name,
-                            'item_count': item_count,
-                            'faction_full':self.bot.factions[faction_short],
-                            'for_non_vets': item_for_non_vets})
+                    if response.status_code == 200:
+                        json_OnlineShopData = json.loads(response.text)
+                        for item in json_OnlineShopData['ShopContents']:
+                            item_name = item['Name'].replace('\'','\\\'')
+                            item_count = item['Count']
+                            item_for_non_vets = item['AvailableToNonVets']
+                            shops_info[faction_short].append(
+                                {'item_name':item_name,
+                                'item_count': item_count,
+                                'faction_full':self.bot.factions[faction_short],
+                                'for_non_vets': item_for_non_vets})
+                    else:
+                        self.bot.logger.addlog(f'cant update "'+ self.bot.factions[faction_short] + '" blackmarket info, server response code = ' + str(response.status_code))
                 # ------------------------------------------------------------------------------------------------------------------------------------------------------
                 # creating query for inser all data
                 if shops_info == {}: return
@@ -209,7 +226,10 @@ class loop_tasks(commands.Cog):
                 #self.LLC.addlog('Blackmarket information updated')
                 # ------------------------------------------------------------------------------------------------------------------------------------------------------
             except Exception as error:
-                self.bot.LLC.addlog(str(error),msg_type='error')
+                if url != 'url': print(f'{url=}')
+                if response != '': print(f'{response=}')
+                if response.text != '': print(f'{response.text=}')
+                self.bot.logger.adderrorlog()
         # **********************************************************************************************************************************************************
         try:
             if self.bot.roguewar_token == '':

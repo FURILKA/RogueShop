@@ -1,4 +1,5 @@
 from logger import LocalLogCollector
+from logger import botlogger
 from discord.ext import commands
 from configurator import configurator
 from mysqlconnector import mySQLConnector
@@ -16,6 +17,7 @@ bot = commands.Bot(command_prefix=prefix,intents=intents)
 bot.remove_command('help')
 bot.prefix = prefix
 bot.LLC = LocalLogCollector()
+bot.logger = botlogger()
 bot.owners = owners.split(';')
 mysql_host=config.get(section='mySQL',setting='host')
 mysql_user=config.get(section='mySQL',setting='user')
