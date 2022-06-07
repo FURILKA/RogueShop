@@ -6,8 +6,6 @@ import discord
 import threading
 import requests
 import json
-import bs4
-import re
 # ==================================================================================================================================================================
 class loop_tasks(commands.Cog):
     # **************************************************************************************************************************************************************
@@ -32,7 +30,7 @@ class loop_tasks(commands.Cog):
         load_factions()
         self.LLC.addlog('Factions loaded')
         # ----------------------------------------------------------------------------------------------------------------------------------------------------------
-        if self.bot.launch_type == 'main_build':
+        if self.bot.launch_type != 'main_build':
             self.LLC.addlog('Running RogueWar API-token update function')
             self.roguewar_token_update.start()
             self.LLC.addlog('Running Factions list update function')
@@ -62,25 +60,17 @@ class loop_tasks(commands.Cog):
     async def factions_list_update(self):
         try:
             self.LLC.addlog('Updating factions list')
-            url = self.bot.rogue_mainsite+'factions'
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36',}
-            request = requests.get(f'{self.bot.rogue_mainsite}factions',headers=headers)
-            soup = bs4.BeautifulSoup(request.text,features='lxml')
+            url = self.bot.rogue_mainsite + '/api/factions'
+            response = requests.get(url,headers={'Authorization':f'Bearer {self.bot.roguewar_token}'})
             values = []
             factions = {}
-            table = soup.findAll('a')
-            table.pop(0)
-            for item in table:
-                s_item = str(item)
-                re_result = re.findall(r'"/([^"]*)"', s_item)
-                if re_result != []:
-                    href = re_result[0]
-                    x = href.find('factions/')
-                    if href.find('factions/')>=0 and href.find('/overview')>=0:
-                        faction_full = href.replace('factions/','').replace('/overview','')
-                        faction_short = faction_full.lower()
-                        if not f"('{faction_short}','{faction_full}')" in values:
-                            values.append(f"('{faction_short}','{faction_full}')")
+            if response.status_code == 200:
+                json_Factions = json.loads(response.text)
+                for faction in json_Factions['FactionList']:
+                    if faction['ShopAvailable'] == True:
+                        faction_short = faction['Name'].lower()
+                        faction_full = faction['DisplayName']
+                        values.append(f"('{faction_short}','{faction_full}')")
                         if not faction_short in factions:
                             factions[faction_short]=faction_full
             self.bot.mysql.execute('TRUNCATE TABLE factions_list')
@@ -135,7 +125,7 @@ class loop_tasks(commands.Cog):
                                 'faction_full':self.bot.factions[faction_short],
                                 'for_non_vets': item_for_non_vets})
                     else:
-                        self.bot.logger.addlog(f'cant update "'+ self.bot.factions[faction_short] + '" online shop info, server response code = ' + str(response.status_code))
+                        self.bot.logger.addlog(f'cant update "{faction_short}" online shop info, server response code = {str(response.status_code)}')
                 # ------------------------------------------------------------------------------------------------------------------------------------------------------
                 # creating query for inser all data
                 if shops_info == {}: return
