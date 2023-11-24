@@ -6,7 +6,7 @@ from mysqlconnector import mySQLConnector
 import discord
 import os
 # ==================================================================================================================================================================
-config = configurator(os.path.dirname(os.path.realpath(__file__))+"\config\config.ini")
+config = configurator(os.path.dirname(os.path.realpath(__file__))+"/config/config.ini")
 prefix = config.get(section='bot',setting='prefix')
 token  = config.get(section='bot',setting='token')
 owners = config.get(section='bot',setting='owners')

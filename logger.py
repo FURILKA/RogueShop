@@ -78,7 +78,7 @@ class LocalLogCollector(object):
                     msg_text = msg_text.replace("'","\\'")
                     values += "('"+row['id']+"','"+str(row['date'])+"','"+row['location']+"','"+row['type']+"','"+row['lib_name']+"','"+row['function_name']+"','"+msg_text+"'),"
                 values = values[0:-1]
-                config = configurator(os.path.dirname(os.path.realpath(__file__))+"\config\config.ini")
+                config = configurator(os.path.dirname(os.path.realpath(__file__))+"/config/config.ini")
                 sqlCon = pymysql.connect(
                     host = config.get(section='mySQL',setting='host'),
                     user = config.get(section='mySQL',setting='user'),

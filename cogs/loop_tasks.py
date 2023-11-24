@@ -30,7 +30,8 @@ class loop_tasks(commands.Cog):
         load_factions()
         self.LLC.addlog('Factions loaded')
         # ----------------------------------------------------------------------------------------------------------------------------------------------------------
-        if self.bot.launch_type != 'main_build':
+        self.LLC.addlog(f'bot launch type: {self.bot.launch_type}')
+        if self.bot.launch_type == 'main_build':
             self.LLC.addlog('Running RogueWar API-token update function')
             self.roguewar_token_update.start()
             self.LLC.addlog('Running Factions list update function')
@@ -44,7 +45,6 @@ class loop_tasks(commands.Cog):
             self.LLC.addlog('Logger started')
             self.export_logs.start()
         else:
-            self.LLC.addlog(f'{self.bot.launch_type=}')
             self.LLC.addlog('This is dev build')
             self.LLC.addlog('RogueWar API-token update skipped')
             self.LLC.addlog('Factions list update skipped')
